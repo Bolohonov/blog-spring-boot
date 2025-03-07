@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Название поста</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="form-container" id="postForm">
+    <h2>Редактировать пост</h2>
+    <form id="postFormElement" method="POST" enctype="multipart/form-data">
+        <label for="title">Название поста:</label>
+        <input type="text" id="title" name="title" th:value="${title}" required/>
+
+        <label for="image">Картинка:</label>
+        <input type="file" id="image" name="image" accept="image/*" required />
+
+        <label for="content">Текст поста:</label>
+        <textarea id="content" name="content" rows="5" th:value="${content}" required ></textarea>
+
+        <label for="tags">Теги (через запятую):</label>
+        <input type="text" id="tags" name="tags" placeholder="тег1, тег2, тег3"  th:value="${tags}"/>
+
+        <button type="submit">Сохранить пост</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('postFormElement').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+        const currentUrl = window.location.href;
+        fetch(currentUrl, {
+            method: 'PUT',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                window.location.reload();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${post.title}">Название поста</title>
+</head>
+<body>
+
+<div class="post">
+    <h1 th:text="${post.title}">Название поста</h1>
+    <img th:src="@{'data:image/png;base64,'+${post.image}}" alt="Картинка поста" class="post-image">
+    <div class="content" th:utext="${post.content}"></div>
+    <div class="tags">
+        <span th:each="tag : ${post.tags}" th:text="' #' + ${tag.name}"></span>
+    </div>
+
+    <div class="actions">
+        <button th:onclick="'deletePost(' + ${post.id} + ')'">Удалить пост</button>
+        <button th:onclick="'editPost(' + ${post.id} + ')'">Редактировать пост</button>
+        <button th:onclick="'likePost(' + ${post.id} + ')'">Лайк (<span th:text="${post.likes}"></span>)</button>
+    </div>
+
+    <div class="comments">
+        <h2>Комментарии</h2>
+        <div th:each="comment : ${post.comments}">
+            <div class="comment">
+                <p th:text="${comment.text}"></p>
+                <div class="comment-actions">
+                    <button th:onclick="'editComment(' + ${comment.id} + ')'">Редактировать</button>
+                    <button th:onclick="'deleteComment(' + ${comment.id} + ')'">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form action="#" th:action="@{/comment}" th:object="${comment}" method="post">
+        <p>Комментарий: <input type="text" th:field="*{text}" /></p>
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+    </form>
+</div>
+
+<script>
+    function deletePost(postId) {
+        if (confirm('Вы уверены, что хотите удалить этот пост?')) {
+            const currentUrl = window.location.href;
+            fetch(currentUrl, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        }
+    }
+
+    function editPost(postId) {
+        const currentUrl = window.location.href;
+        window.location.href = currentUrl + '/edit'
+    }
+
+    function likePost(postId) {
+        fetch(`/api/posts/${postId}/like`, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Вы поставили лайк.');
+                    // Обновление количества лайков на странице
+                    let likeElement = document.querySelector(`.post[data-id='${postId}'] .actions .like-count`);
+                    let currentLikes = parseInt(likeElement.textContent, 10);
+                    likeElement.textContent = currentLikes + 1;
+                } else {
+                    alert('Ошибка при попытке поставить лайк.');
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+
+    // Функция для редактирования комментария
+    function editComment(commentId) {
+        let newCommentText = prompt('Введите новый текст комментария:');
+        if (newCommentText) {
+            fetch(`/api/comments/${commentId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: newCommentText })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Комментарий успешно обновлён.');
+                        // Обновление текста комментария на странице
+                        document.querySelector(`.comment[data-id='${commentId}'] p`).textContent = newCommentText;
+                    } else {
+                        alert('Ошибка при обновлении комментария.');
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        }
+    }
+
+    // Функция для удаления комментария
+    function deleteComment(commentId) {
+        if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
+            fetch(`/api/comments/${commentId}`, {
+                method: 'DELETE',
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Комментарий успешно удалён.');
+                        // Удаление комментария из DOM
+                        document.querySelector(`.comment[data-id='${commentId}']`).remove();
+                    } else {
+                        alert('Ошибка при удалении комментария.');
+                    }
+                })
+                .catch(error => console.error('Ошибка:', error));
+        }
+    }
+
+</script>
+</body>
+</html>

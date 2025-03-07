@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Название страницы-->
+    <title>Посты</title>
+
+    <!-- Стили страницы -->
+    <link rel="stylesheet" href="css/style.css"></head>
+<body>
+<header>
+    <h1>Мой Блог</h1>
+</header>
+
+<main>
+    <button class="btn-add" onclick="toggleForm()">Добавить пользователя</button>
+
+    <section class="filters">
+        <h2>Фильтрация по тегам</h2>
+        <ul class="tag-list">
+            <li th:each="tag : ${tags}">
+                <a th:href="@{/feed(tag=${tag})}" th:text="${tag}"></a>
+            </li>
+        </ul>
+    </section>
+
+    <section class="posts">
+        <h2>Посты</h2>
+        <div th:each="post : ${posts}">
+            <article class="post">
+                <h3><a th:href="@{/blog/post/{id}(id=${post.id})}" th:text="${post.title}"></a></h3>
+                <img th:src="@{'data:image/png;base64,'+${post.image}}" alt="Картинка поста" class="post-image">
+                <p th:text="${post.content.length() < 100 ? post.content : post.content.substring(0, 100) + '...'}"></p>
+                <div class="post-meta">
+                    <span th:text="'Комментарии: ' + ${post.comments.size()}"></span>
+                    <span th:text="'Лайки: ' + ${post.likes.size()}"></span>
+                    <span>Теги:
+                            <span th:each="tag : ${post.tags}">
+                                <a th:href="@{/blog(tag=${tag.name})}" th:text="${tag.name}"></a><span> </span>
+                            </span>
+                        </span>
+                </div>
+            </article>
+        </div>
+
+        <!-- Пагинация -->
+        <div class="pagination">
+                <span th:if="${currentPage > 1}">
+                    <a th:href="@{/blog(page=${currentPage - 1}, size=${pageSize})}">Назад</a>
+                </span>
+
+            <span th:each="page : ${pages}">
+                    <a th:href="@{/blog(page=${page}, size=${pageSize})}" th:text="${page}"></a>
+            </span>
+
+            <span th:if="${currentPage < totalPages}">
+                    <a th:href="@{/blog(page=${currentPage + 1}, size=${pageSize})}">Вперед</a>
+                </span>
+
+            <span th:text="'Показано ' + ${posts.size()} + ' из ' + ${posts.size()} + ' постов'"></span>
+        </div>
+    </section>
+
+
+    <!-- Скрываемая форма для добавления нового пользователя -->
+    <div class="form-container" style="display: none;" id="postForm">
+        <h2>Добавить пост</h2>
+        <form id="postFormElement" method="POST" enctype="multipart/form-data">
+            <label for="title">Название поста:</label>
+            <input type="text" id="title" name="title" required/>
+
+            <label for="image">Картинка:</label>
+            <input type="file" id="image" name="image" accept="image/*" required />
+
+            <label for="content">Текст поста:</label>
+            <textarea id="content" name="content" rows="5" required ></textarea>
+
+            <label for="tags">Теги (через запятую):</label>
+            <input type="text" id="tags" name="tags" placeholder="тег1, тег2, тег3"/>
+
+            <button type="submit">Сохранить пост</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleForm() {
+            const form = document.getElementById('postForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        document.getElementById('postFormElement').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const currentUrl = window.location.href;
+            const postUrl = currentUrl + '/post';
+            fetch(postUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+
+</main>
+
+</body>
+</html>
