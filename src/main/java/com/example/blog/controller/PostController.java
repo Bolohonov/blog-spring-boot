@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/blog")
+@RequestMapping("/blog")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
@@ -26,7 +26,7 @@ public class PostController {
     @PostMapping(path = "/post", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public String savePost(@ModelAttribute PostRequest request) {
         postService.save(request);
-        return "redirect:/api/blog";
+        return "redirect:/blog";
     }
 
     @GetMapping("/post/{id}")
@@ -39,19 +39,19 @@ public class PostController {
     @DeleteMapping( "/post/{id}")
     public String deletePost(@PathVariable("id") Long id) {
         postService.removeById(id);
-        return "redirect:/api/blog";
+        return "redirect:/blog";
     }
 
     @PutMapping( "/post/{id}/update")
     public String update(@ModelAttribute PostRequest request, @PathVariable("id") Long id) {
         postService.update(id, request);
-        return "redirect:/api/blog";
+        return "redirect:/blog";
     }
 
     @PostMapping( "/post/{id}/comment")
     public String addComment(@PathVariable("id") Long id, @ModelAttribute CommentRequest comment) {
         postService.addComment(id, comment);
-        return "redirect:/api/blog/post/" + id;
+        return "redirect:/blog/post/" + id;
     }
 
     @DeleteMapping( "/post/{id}/comment/{commentId}")
