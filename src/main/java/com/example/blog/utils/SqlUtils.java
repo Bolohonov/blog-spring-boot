@@ -1,4 +1,4 @@
-package org.example.blog.utils;
+package com.example.blog.utils;
 
 
 import java.sql.ResultSet;

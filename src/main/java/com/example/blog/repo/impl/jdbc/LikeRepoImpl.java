@@ -3,7 +3,7 @@ package com.example.blog.repo.impl.jdbc;
 import lombok.RequiredArgsConstructor;
 import com.example.blog.model.Like;
 import com.example.blog.repo.LikeRepo;
-import org.example.blog.utils.SqlUtils;
+import com.example.blog.utils.SqlUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -23,10 +23,6 @@ public class LikeRepoImpl implements LikeRepo {
             """;
 
     private final JdbcTemplate template;
-
-    public LikeRepoImpl(JdbcTemplate template) {
-        this.template = template;
-    }
 
     @Override
     public void save(Like like) {

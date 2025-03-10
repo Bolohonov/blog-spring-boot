@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -18,7 +17,7 @@ public class PostResponse {
     private String image;
     private LocalDateTime created;
     private LocalDateTime updated;
-    private Set<CommentResponse> comments = new HashSet<>();
-    private Set<LikeResponse> likes = new HashSet<>();
-    private Set<TagResponse> tags = new HashSet<>();
+    private Set<CommentResponse> comments;
+    private Set<LikeResponse> likes;
+    private Set<TagResponse> tags;
 }

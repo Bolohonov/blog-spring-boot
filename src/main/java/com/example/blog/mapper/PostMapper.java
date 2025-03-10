@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Base64;
 
-@Mapper(uses = TagMapper.class)
+@Mapper(componentModel = "spring", uses = TagMapper.class)
 public interface PostMapper {
 
     PostResponse toResponse(Post post);

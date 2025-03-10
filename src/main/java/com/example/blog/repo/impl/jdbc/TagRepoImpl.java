@@ -50,10 +50,6 @@ public class TagRepoImpl implements TagRepo {
 
     private final JdbcTemplate template;
 
-    public TagRepoImpl(JdbcTemplate template) {
-        this.template = template;
-    }
-
     @Override
     public List<Tag> save(List<Tag> tags) {
         for (Tag tag : tags) {
