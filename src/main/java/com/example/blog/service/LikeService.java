@@ -1,9 +1,9 @@
-package org.example.blog.service;
+package com.example.blog.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.blog.model.Like;
-import org.example.blog.model.Post;
-import org.example.blog.repo.LikeRepo;
+import com.example.blog.model.Like;
+import com.example.blog.model.Post;
+import com.example.blog.repo.LikeRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
