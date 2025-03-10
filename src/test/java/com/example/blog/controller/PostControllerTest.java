@@ -1,8 +1,11 @@
 package com.example.blog.controller;
 
+import com.example.blog.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -14,21 +17,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebAppConfiguration
+@WebMvcTest(PostController.class)
 @TestPropertySource(locations = "classpath:test-application.properties")
 public class PostControllerTest {
 
     @Autowired
-    private PostController postController;
-
     private MockMvc mockMvc;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(postController)
-                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-                .build();
-    }
+    @Mock
+    private PostService postService;
 
     @Test
     @Sql({
@@ -112,4 +109,5 @@ public class PostControllerTest {
         mockMvc.perform(get("/api/blog/post/2/like"))
                 .andExpect(status().isOk());
     }
+
 }
