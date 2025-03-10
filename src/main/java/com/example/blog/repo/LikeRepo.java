@@ -1,6 +1,6 @@
-package org.example.blog.repo;
+package com.example.blog.repo;
 
-import org.example.blog.model.Like;
+import com.example.blog.model.Like;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

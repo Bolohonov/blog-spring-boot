@@ -1,8 +1,8 @@
-package org.example.blog.repo.impl.jdbc;
+package com.example.blog.repo.impl.jdbc;
 
 import lombok.RequiredArgsConstructor;
-import org.example.blog.model.Post;
-import org.example.blog.repo.PostRepo;
+import com.example.blog.model.Post;
+import com.example.blog.repo.PostRepo;
 import org.example.blog.utils.SqlUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -48,6 +48,10 @@ public class PostRepoImpl implements PostRepo {
     private static final String DELETE_BY_ID = "DELETE FROM POSTS P WHERE P.id = ?";
 
     private final JdbcTemplate template;
+
+    public PostRepoImpl(JdbcTemplate template) {
+        this.template = template;
+    }
 
     @Override
     public Long saveWithoutTags(Post post) {

@@ -1,11 +1,11 @@
-package org.example.blog.service;
+package com.example.blog.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.blog.mapper.CommentMapper;
-import org.example.blog.controller.request.CommentRequest;
-import org.example.blog.model.Comment;
-import org.example.blog.model.Post;
-import org.example.blog.repo.CommentRepo;
+import com.example.blog.mapper.CommentMapper;
+import com.example.blog.controller.request.CommentRequest;
+import com.example.blog.model.Comment;
+import com.example.blog.model.Post;
+import com.example.blog.repo.CommentRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

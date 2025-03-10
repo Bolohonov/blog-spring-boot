@@ -1,6 +1,6 @@
-package org.example.blog.repo;
+package com.example.blog.repo;
 
-import org.example.blog.model.Post;
+import com.example.blog.model.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;

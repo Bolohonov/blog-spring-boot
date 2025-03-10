@@ -1,15 +1,15 @@
-package org.example.blog.service;
+package com.example.blog.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.blog.mapper.PostMapper;
-import org.example.blog.controller.request.CommentRequest;
-import org.example.blog.controller.request.PostRequest;
-import org.example.blog.controller.response.PostResponse;
-import org.example.blog.model.Comment;
-import org.example.blog.model.Like;
-import org.example.blog.model.Post;
-import org.example.blog.model.Tag;
-import org.example.blog.repo.PostRepo;
+import com.example.blog.mapper.PostMapper;
+import com.example.blog.controller.request.CommentRequest;
+import com.example.blog.controller.request.PostRequest;
+import com.example.blog.controller.response.PostResponse;
+import com.example.blog.model.Comment;
+import com.example.blog.model.Like;
+import com.example.blog.model.Post;
+import com.example.blog.model.Tag;
+import com.example.blog.repo.PostRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

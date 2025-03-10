@@ -1,9 +1,9 @@
-package org.example.blog.repo.impl.jdbc;
+package com.example.blog.repo.impl.jdbc;
 
 import lombok.RequiredArgsConstructor;
-import org.example.blog.model.Post;
-import org.example.blog.model.Tag;
-import org.example.blog.repo.TagRepo;
+import com.example.blog.model.Post;
+import com.example.blog.model.Tag;
+import com.example.blog.repo.TagRepo;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageImpl;
@@ -49,6 +49,10 @@ public class TagRepoImpl implements TagRepo {
             """;
 
     private final JdbcTemplate template;
+
+    public TagRepoImpl(JdbcTemplate template) {
+        this.template = template;
+    }
 
     @Override
     public List<Tag> save(List<Tag> tags) {

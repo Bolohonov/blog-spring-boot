@@ -1,8 +1,8 @@
-package org.example.blog.repo.impl.jdbc;
+package com.example.blog.repo.impl.jdbc;
 
 import lombok.RequiredArgsConstructor;
-import org.example.blog.model.Comment;
-import org.example.blog.repo.CommentRepo;
+import com.example.blog.model.Comment;
+import com.example.blog.repo.CommentRepo;
 import org.example.blog.utils.SqlUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -24,6 +24,10 @@ public class CommentRepoImpl implements CommentRepo {
             """;
 
     private final JdbcTemplate template;
+
+    public CommentRepoImpl(JdbcTemplate template) {
+        this.template = template;
+    }
 
     @Override
     public void save(Comment comment) {

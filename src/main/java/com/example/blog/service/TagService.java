@@ -1,10 +1,10 @@
-package org.example.blog.service;
+package com.example.blog.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.blog.mapper.TagMapper;
-import org.example.blog.controller.response.TagResponse;
-import org.example.blog.model.Tag;
-import org.example.blog.repo.TagRepo;
+import com.example.blog.mapper.TagMapper;
+import com.example.blog.controller.response.TagResponse;
+import com.example.blog.model.Tag;
+import com.example.blog.repo.TagRepo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
