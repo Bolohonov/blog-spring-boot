@@ -1,53 +1,62 @@
 package com.example.blog.controller;
 
+import com.example.blog.controller.request.PostRequest;
+import com.example.blog.controller.response.PostResponse;
+import com.example.blog.model.Post;
 import com.example.blog.service.PostService;
+import com.example.blog.service.TagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@WebMvcTest(PostController.class)
-@ActiveProfiles("test")
+import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@ExtendWith(MockitoExtension.class)
 public class PostControllerTest {
 
-    @Autowired
+    private static final Long EXISTING_POST_ID = 2L;
+
+    private final Post post = getPost();
+    private final PostResponse postResponse = getPostResponse();
+    private final PostRequest postRequest = getPostRequest();
+
+
     private MockMvc mockMvc;
 
     @Mock
     private PostService postService;
+    @Mock
+    private TagService tagService;
+    @InjectMocks
+    private PostController postController;
 
-    @Test
-    @Sql({
-            "sql/posts.sql",
-            "sql/tags.sql",
-            "sql/comments.sql",
-            "sql/likes.sql",
-            "sql/posts_tags.sql",
-    })
-    void getPosts_shouldReturnHtmlWithPosts() throws Exception {
-        mockMvc.perform(get("/api/blog"))
-                .andExpect(status().isOk());
+    @BeforeEach
+    public void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(postController)
+                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+                .build();
     }
 
     @Test
-    @Sql({
-            "sql/posts.sql",
-            "sql/tags.sql"
-    })
     void savePost_shouldSavePost() throws Exception {
-        mockMvc.perform(post("/api/blog/post")
+        mockMvc.perform(post("/blog/post")
                         .param("title", "title")
                         .param("content", "content")
                         .param("tags", "tag1,tag2,tag3")
@@ -58,28 +67,41 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql({"sql/posts.sql",
-            "sql/tags.sql",
-            "sql/posts_tags.sql",
-            "sql/comments.sql",
-            "sql/likes.sql"})
     void getPost_shouldReturnHtmlWithPost() throws Exception {
-        mockMvc.perform(get("/api/blog/post/2"))
-                .andExpect(status().isOk());
+        when(postService.getById(EXISTING_POST_ID)).thenReturn(postResponse);
+        mockMvc.perform(get("/blog/post/2"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("post"))
+                .andExpect(model().attributeExists("post"))
+                .andExpect(model().attribute("post", hasProperty("title", is("Пост1"))));;
     }
 
     @Test
-    @Sql("sql/posts.sql")
+    void getPost_shouldReturnHtmlWithPosts() throws Exception {
+        List<PostResponse> responses = List.of(postResponse);
+        Page<PostResponse> posts = new PageImpl<>(responses);
+        when(postService.getPosts(ArgumentMatchers.any(Pageable.class))).thenReturn(posts);
+        when(tagService.getAllTags()).thenReturn(List.of("Tag1", "Tag2"));
+
+        mockMvc.perform(get("/blog")
+                .param("page", "0")
+                .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("feed"))
+                .andExpect(model().attributeExists("posts"))
+                .andExpect(model().attribute("posts", responses));
+
+    }
+
+    @Test
     void deletePost_shouldDeletePost() throws Exception {
-        mockMvc.perform(delete("/api/blog/post/3"))
+        mockMvc.perform(delete("/blog/post/3"))
                 .andExpect(status().is3xxRedirection());
     }
 
     @Test
-    @Sql({"sql/posts.sql",
-            "sql/tags.sql"})
     void updatePost_shouldUpdatePost() throws Exception {
-        mockMvc.perform(put("/api/blog/post/4/update")
+        mockMvc.perform(put("/blog/post/4/update")
                         .param("title", "newTitle")
                         .param("content", "newContent")
                         .param("tags", "Тег1,Тег3")
@@ -89,26 +111,41 @@ public class PostControllerTest {
     }
 
     @Test
-    @Sql("sql/posts.sql")
     void addComment_shouldAddComment() throws Exception {
-        mockMvc.perform(post("/api/blog/post/2/comment")
+        mockMvc.perform(post("/blog/post/2/comment")
                         .param("text", "newText")
                 )
                 .andExpect(status().is3xxRedirection());
     }
 
     @Test
-    @Sql({"sql/posts.sql", "sql/comments.sql"})
     void deleteComment_shouldDeleteComment() throws Exception {
-        mockMvc.perform(delete("/api/blog/post/2/comment/1"))
+        mockMvc.perform(delete("/blog/post/2/comment/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @Sql("sql/posts.sql")
     void likePost_shouldLikePost() throws Exception {
-        mockMvc.perform(get("/api/blog/post/2/like"))
+        mockMvc.perform(get("/blog/post/2/like"))
                 .andExpect(status().isOk());
+    }
+
+    Post getPost() {
+        return new Post(2L, "Пост1", "11111", null, LocalDateTime.now(), LocalDateTime.now());
+    }
+
+    PostResponse getPostResponse() {
+        return PostResponse.builder()
+                .id(2L)
+                .title("Пост1")
+                .content("11111")
+                .build();
+    }
+
+    PostRequest getPostRequest() {
+        PostRequest postRequest = new PostRequest();
+        postRequest.setTitle("Пост1");
+        return postRequest;
     }
 
 }

@@ -85,7 +85,6 @@ public class PostRepoImpl implements PostRepo {
 
     @Override
     public void updateWithoutTags(Post post) {
-        System.out.println("UPDATE");
         template.update(
                 UPDATE_QUERY, post.getTitle(), post.getContent(), post.getImage(), post.getId()
         );
