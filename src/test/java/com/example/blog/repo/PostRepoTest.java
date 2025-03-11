@@ -110,23 +110,18 @@ public class PostRepoTest {
         post.setImage(new byte[]{1, 2, 3});
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        Connection connection = mock(Connection.class);
-        PreparedStatement ps = mock(PreparedStatement.class);
-        ResultSet rs = mock(ResultSet.class);
-
-        when(connection.prepareStatement(anyString(), anyInt())).thenReturn(ps);
-        when(ps.getGeneratedKeys()).thenReturn(rs);
-        when(rs.next()).thenReturn(true);
-        when(rs.getLong(1)).thenReturn(1L);
 
         doAnswer(invocation -> {
             PreparedStatementCreator psc = invocation.getArgument(0);
-            KeyHolder kh = invocation.getArgument(1);
-            psc.createPreparedStatement(connection).executeUpdate();
-            kh.getKeyList().add(Collections.singletonMap("id", 1L));
+            Connection connection = mock(Connection.class);
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO POSTS (title, content, image) VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, post.getTitle());
+            ps.setString(2, post.getContent());
+            ps.setBytes(3, post.getImage());
+            ps.executeUpdate();
+            keyHolder.getKeyList().add(Collections.singletonMap("id", 1L));
             return null;
         }).when(template).update(any(PreparedStatementCreator.class), any(KeyHolder.class));
-
 
         Long postId = postRepoImpl.saveWithoutTags(post);
 
