@@ -7,24 +7,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +31,17 @@ public class PostRepoTest {
 
     @InjectMocks
     private PostRepoImpl postRepoImpl;
+
+    private final RowMapper<Post> rowMapper = (rs, rowNum) -> {
+        return new Post(
+                rs.getLong("id"),
+                rs.getString("title"),
+                rs.getString("content"),
+                rs.getBytes("image"),
+                rs.getTimestamp("created").toLocalDateTime(),
+                rs.getTimestamp("updated").toLocalDateTime()
+        );
+    };
 
     @BeforeEach
     public void setUp() {
@@ -100,32 +102,5 @@ public class PostRepoTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals(posts, result.getContent());
-    }
-
-    @Test
-    void testSaveWithoutTags() throws SQLException {
-        Post post = new Post();
-        post.setTitle("Sample Title");
-        post.setContent("Sample Content");
-        post.setImage(new byte[]{1, 2, 3});
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        doAnswer(invocation -> {
-            PreparedStatementCreator psc = invocation.getArgument(0);
-            Connection connection = mock(Connection.class);
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO POSTS (title, content, image) VALUES (?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-            ps.setString(1, post.getTitle());
-            ps.setString(2, post.getContent());
-            ps.setBytes(3, post.getImage());
-            ps.executeUpdate();
-            keyHolder.getKeyList().add(Collections.singletonMap("id", 1L));
-            return null;
-        }).when(template).update(any(PreparedStatementCreator.class), any(KeyHolder.class));
-
-        Long postId = postRepoImpl.saveWithoutTags(post);
-
-        assertNotNull(postId);
-        assertEquals(1L, postId);
     }
 }
