@@ -74,6 +74,10 @@
         ```bash
         gradle run
         ```
+    - Для создания FatJar **Gradle**:
+        ```bash
+        gradle shadowJar
+        ```
 
 2. Откройте браузер и перейдите по адресу:
     ```

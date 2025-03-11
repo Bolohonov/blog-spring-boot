@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.github.johnrengelman.shadow' version '7.1.1' // Добавлен плагин Shadow
 }
 
 group = 'com.example'
@@ -40,4 +41,23 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+// Добавление задачи shadowJar для создания fat jar
+tasks.named('bootJar') {
+	enabled = false
+}
+
+tasks.named('jar') {
+	enabled = true
+}
+
+tasks.withType(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+	archiveClassifier.set('')
+	mergeServiceFiles()
+	configurations = [project.configurations.runtimeClasspath]
 }
